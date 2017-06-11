@@ -260,6 +260,8 @@ public class Main {
 
             articulo.setAutor(usuario);
             articulo.setFecha(new Date());
+            articulo.setLikes(0);
+            articulo.setDislikes(0);
 
             articuloServices.crear(articulo);
 

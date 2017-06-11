@@ -103,7 +103,7 @@ public class GestionDb<T> {
         try {
             CriteriaQuery<T> criteriaQuery = entityManager.getCriteriaBuilder().createQuery(this.entidad);
             criteriaQuery.select(criteriaQuery.from(this.entidad));
-            return entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery).getResultList();
         }catch (Exception e){
             throw e;
         }finally {
