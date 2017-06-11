@@ -268,7 +268,7 @@ public class Main {
             //getting the recent ID
             ArticuloServices articuloServices1=ArticuloServices.getInstancia();
             List <Articulo>articulos= articuloServices1.findAll();
-            System.out.println(articulos.get(0).getAutor()+"=======================================");
+           // System.out.println(articulos.get(0).getAutor()+"=======================================");
             long id = articulos.get(articulos.size()-1).getId();
 
             if(etiquetas.length!=0){
