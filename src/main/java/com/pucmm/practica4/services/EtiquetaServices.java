@@ -1,10 +1,12 @@
 package com.pucmm.practica4.services;
 
-
+import com.pucmm.practica4.entidades.Articulo;
 import com.pucmm.practica4.entidades.Etiqueta;
 import com.pucmm.practica4.services.ComentarioServices;
 import com.pucmm.practica4.services.GestionDb;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +29,14 @@ public class EtiquetaServices extends GestionDb<Etiqueta> {
             instancia = new EtiquetaServices();
         }
         return instancia;
+    }
+
+    public List<Etiqueta> findAllByArticulo(Articulo articulo){
+        EntityManager em=getEntityManager();
+        Query query=em.createNamedQuery("Etiqueta.findAllbyArticulo");
+        query.setParameter("articulo",articulo+"%");
+        List<Etiqueta> etiquetas=query.getResultList();
+        return etiquetas;
     }
 
 }

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * Created by john on 04/06/17.
  */
 @Entity
-@NamedQueries({@NamedQuery(name="Etiqueta.findAllById", query = "select e from Etiqueta e where e.id like :id")})
+@NamedQueries({@NamedQuery(name="Etiqueta.findAllByArticulo", query = "select e from Etiqueta e where e.articulo like :articulo")})
 public class Etiqueta implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
