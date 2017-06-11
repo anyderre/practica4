@@ -6,10 +6,11 @@ import javax.persistence.*;
  * Created by john on 04/06/17.
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Comentario.findAllById", query = "select c from Comentario c where c.id like :id")})
 public class Comentario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+      private long id;
     private String comentario;
     @OneToOne
     private Usuario autor;
