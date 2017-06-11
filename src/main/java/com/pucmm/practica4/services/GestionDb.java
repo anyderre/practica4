@@ -45,9 +45,13 @@ public class GestionDb<T> {
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         try {
+            if(getFieldValue(entidad)!=null && entityManager.find(this.entidad,getFieldValue(entidad))==null){
+                entityManager.merge(entidad);
+                entityManager.getTransaction().commit();
+            }else {
+                System.out.println("la entidad no existe");
+            }
 
-            entityManager.merge(entidad);
-            entityManager.getTransaction().commit();
         }catch (Exception ex){
             entityManager.getTransaction().rollback();
         }finally {

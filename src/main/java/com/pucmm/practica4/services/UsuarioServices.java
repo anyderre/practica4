@@ -29,11 +29,11 @@ public class UsuarioServices extends GestionDb<Usuario> {
         return instancia;
     }
 
-    public Usuario getUsuario(String username){
+    public List getUsuario(String username){
         EntityManager entityManager = getEntityManager();
         Query query= entityManager.createNamedQuery("Usuario.findByUsername");
         query.setParameter("username", username+"%");
-        return (Usuario)query.getSingleResult();
+        return query.getResultList();
 
     }
 }

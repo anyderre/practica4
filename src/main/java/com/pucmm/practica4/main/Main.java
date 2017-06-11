@@ -38,10 +38,6 @@ public class Main {
         //Starting database
         BootStrapServices.getInstancia().init();
 
-        //Testing Connection
-
-        //Creating table if not exists
-        BootStrapServices.getInstancia().init();
 
             //Adding admin user
             UsuarioServices usuarioServices = UsuarioServices.getInstancia();
@@ -53,8 +49,9 @@ public class Main {
                 insertar.setNombre("Jhon Ridore");
                 insertar.setPassword("1234");
                 insertar.setUsername("anyderre");
-
-             if(usuarioServices.findAll()==null){
+        System.out.println("there");
+             if(usuarioServices.getUsuario("anyderre").isEmpty()){
+                 System.out.println("there");
                 usuarioServices.crear(insertar);
 
             }
@@ -71,9 +68,6 @@ public class Main {
 
                     ArticuloServices articuloServices = ArticuloServices.getInstancia();
                     ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAll();
-
-
-
                     EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
                     ComentarioServices comentarioServices = ComentarioServices.getInstancia();
                     List<Etiqueta> etiquetas = null;
@@ -120,14 +114,14 @@ public class Main {
             usuario.setPassword(password);
             UsuarioServices usuarioServices1 = UsuarioServices.getInstancia();
 
-            Usuario usuario1 = usuarioServices1.getUsuario(username);
-           if(usuario1.getNombre()!=null){
+            List<Usuario> usuarios = usuarioServices1.getUsuario(username);
+           if(usuarios.get(0).getNombre()!=null){
 
-                 if(usuario1.getUsername().equals(username) && usuario1.getPassword().equals(password)) {
-                     usuario.setId(usuarioServices1.getUsuario(username).getId());
-                     usuario.setAutor(usuarioServices1.getUsuario(username).getAutor());
-                     usuario.setAdministrador(usuarioServices1.getUsuario(username).getAdministrador());
-                     usuario.setNombre(usuarioServices1.getUsuario(username).getNombre());
+                 if(usuarios.get(0).getUsername().equals(username) && usuarios.get(0).getPassword().equals(password)) {
+                     usuario.setId(usuarios.get(0).getId());
+                     usuario.setAutor(usuarios.get(0).getAutor());
+                     usuario.setAdministrador(usuarios.get(0).getAdministrador());
+                     usuario.setNombre(usuarios.get(0).getNombre());
                      session.attribute("usuario", usuario);
                      response.redirect("/");
                  }
@@ -271,8 +265,9 @@ public class Main {
 
             //getting the recent ID
             ArticuloServices articuloServices1=ArticuloServices.getInstancia();
-            List <Articulo>articulo1= articuloServices1.findAll();
-            long id = articulo1.get(articulo1.size()-1).getId();
+            List <Articulo>articulos= articuloServices1.findAll();
+            System.out.println(articulos.get(0).getAutor()+"=======================================");
+            long id = articulos.get(articulos.size()-1).getId();
 
             if(etiquetas.length!=0){
                 EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();

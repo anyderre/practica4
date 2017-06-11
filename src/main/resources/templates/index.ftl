@@ -7,11 +7,10 @@
     <#if articulos?size!=0>
         <#list articulos as articulo>
             <div class="article-container">
-
                     <div class="row">
                     <div class="col-md-12">
-                          <div class="col-md-12" style="background-color: burlywood">
-                              <a href="/ver/articulo/${articulo.getId()}" style="text-align: center">
+                          <div class="col-md-12">
+                              <a id="" href="/ver/articulo/${articulo.getId()}">
                                   <h3 class="article-title">${articulo.getTitulo()}</h3>
                               </a>
                           </div>
@@ -22,25 +21,25 @@
                         <#else>
                             <#assign maxLength = cuerpoArticulo?length>
                          </#if>
-                        <p class="article-preview">${cuerpoArticulo?substring(0, maxLength)} ...<a style="color:blue; font-weight: bold" href="/ver/articulo/${articulo.getId()}" >Leer mas</a></p>
+                        <p class="article-preview">${cuerpoArticulo?substring(0, maxLength)} ...<a href="/ver/articulo/${articulo.getId()}" >Leer mas</a></p>
 
                     </div>
 
                     <div class="row">
                         <div class="col-md-offset-8 col-md-4">
-                            <p><b style="">By:</b> <a href="/usuario/${articulo.getAutor().getId()}">${articulo.getAutor().getNombre()} <i class="fa fa-user"></i></a></p>
+                            <p><b>By:</b> <a href="/usuario/${articulo.getAutor().getId()}">${articulo.getAutor().getNombre()} <i class="fa fa-user"></i></a></p>
                         </div>
 
                         <#assign articuloEtiqueta = articulo.getEtiquetas()>
                         <#if articuloEtiqueta?size != 0>
                             <div class="col-md-offset-1 col-md-6 article-tags">
                                 <p>
-                                <div style="display: flex">
+                                <div >
                                     Etiqueta(s) <i class="fa fa-tags"></i>:
 
                                     <#list articuloEtiqueta as etiqueta>
-                                        <div style="background-color: #5bc0de; margin:6px">
-                                            <span style="font-size:15px;color:white">${etiqueta.getEtiqueta()}</span>
+                                        <div>
+                                            <span>${etiqueta.getEtiqueta()}</span>
                                         </div>
 
                                 </#list>
@@ -61,8 +60,8 @@
          <#if noDatos??>
             <div class="row">
                 <div class="col-md-12">
-                    <div class="col-md-12" style="color:darkgray">
-                        <h3>${noDatos}...<a href="/agregar/articulo" style="text-align: center">Agregar un articlo?
+                    <div class="col-md-12">
+                        <h3>${noDatos}...<a href="/agregar/articulo">Agregar un articlo?
                         </a></h3>
                     </div>
                 </div>
