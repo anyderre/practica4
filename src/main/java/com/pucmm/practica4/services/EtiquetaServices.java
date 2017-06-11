@@ -34,7 +34,7 @@ public class EtiquetaServices extends GestionDb<Etiqueta> {
     public List<Etiqueta> findAllByArticulo(Articulo articulo){
         EntityManager em=getEntityManager();
         Query query=em.createNamedQuery("Etiqueta.findAllByArticulo");
-        query.setParameter("articulo",articulo+"%");
+        query.setParameter("articulo",articulo);
         List<Etiqueta> etiquetas=query.getResultList();
         return etiquetas;
     }

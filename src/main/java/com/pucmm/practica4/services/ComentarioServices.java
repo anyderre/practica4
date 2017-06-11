@@ -31,7 +31,7 @@ public class ComentarioServices extends GestionDb<Comentario> {
     public List<Comentario> findAllByArticulo(Articulo articulo){
         EntityManager entityManager = getEntityManager();
         Query query= entityManager.createNamedQuery("Comentario.findAllByArticulo");
-        query.setParameter("articulo", articulo+"%");
+        query.setParameter("articulo", articulo);
         return query.getResultList();
     }
 
