@@ -1,8 +1,11 @@
 package com.pucmm.practica4.services;
 
+import com.pucmm.practica4.entidades.Articulo;
 import com.pucmm.practica4.entidades.Comentario;
 import com.pucmm.practica4.services.GestionDb;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,12 @@ public class ComentarioServices extends GestionDb<Comentario> {
         }
         return instancia;
     }
-
+    public List<Comentario> findAllById(Articulo articulo){
+        EntityManager entityManager = getEntityManager();
+        Query query= entityManager.createNamedQuery("Comentario.findAllByArticulo");
+        query.setParameter("articulo", articulo+"%");
+        List<Comentario> comentarios = query.getResultList();
+        return comentarios;
+    }
 
 }

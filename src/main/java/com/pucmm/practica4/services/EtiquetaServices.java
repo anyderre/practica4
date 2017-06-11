@@ -1,8 +1,6 @@
-package services;
+package com.pucmm.practica4.services;
 
-import com.modelo.Articulo;
-import com.modelo.Etiqueta;
-import com.modelo.Usuario;
+
 import com.pucmm.practica4.entidades.Etiqueta;
 import com.pucmm.practica4.services.ComentarioServices;
 import com.pucmm.practica4.services.GestionDb;
