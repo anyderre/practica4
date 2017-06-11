@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Comentario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-      private long id;
+    private long id;
     private String comentario;
     @OneToOne
     private Usuario autor;
