@@ -1,6 +1,5 @@
 package com.pucmm.practica4.main;
 
-
 import com.pucmm.practica4.entidades.Articulo;
 import com.pucmm.practica4.entidades.Comentario;
 import com.pucmm.practica4.entidades.Etiqueta;
@@ -42,11 +41,10 @@ public class Main {
         //Testing Connection
 
         //Creating table if not exists
-        BootStrapServices.crearTablas();
+        BootStrapServices.getInstancia().init();
 
             //Adding admin user
-            UsuarioServices usuarioServices = new UsuarioServices();
-
+            UsuarioServices usuarioServices = UsuarioServices.getInstancia();
 
                 Usuario insertar = new Usuario();
                 insertar.setAdministrador(true);
@@ -56,8 +54,8 @@ public class Main {
                 insertar.setPassword("1234");
                 insertar.setUsername("anyderre");
 
-             if(usuarioServices.getUsuario(insertar.getUsername()).getNombre()==null){
-                usuarioServices.crearUsuario(insertar);
+             if(usuarioServices.findAll()==null){
+                usuarioServices.crear(insertar);
 
             }
 
@@ -71,19 +69,19 @@ public class Main {
         get("/", (request, response) -> {
                     Map<String, Object> attributes = new HashMap<>();
 
-                    ArticuloServices articuloServices = new ArticuloServices();
-                    ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.listarArticulos();
+                    ArticuloServices articuloServices = ArticuloServices.getInstancia();
+                    ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAll();
 
 
 
-                    EtiquetaServices etiquetaServices = new EtiquetaServices();
-                    ComentarioServices comentarioServices = new ComentarioServices();
+                    EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+                    ComentarioServices comentarioServices = ComentarioServices.getInstancia();
                     List<Etiqueta> etiquetas = null;
                     List<Comentario>comentarios=null;
                     List<Articulo> articulosTemp=new ArrayList<>();
                     for(Articulo articulo: articulos){
-                        etiquetas= etiquetaServices.getAllEtiquetas(articulo.getId());
-                        comentarios= comentarioServices.listarComentarios(articulo.getId());
+                        etiquetas= etiquetaServices.findAllByArticulo(articulo);
+                        comentarios= comentarioServices.findAllByArticulo(articulo);
                         articulo.setEtiquetas(etiquetas);
                         articulo.setComentarios(comentarios);
                         articulosTemp.add(articulo);
@@ -120,13 +118,12 @@ public class Main {
             String password = request.queryParams("password");
             usuario.setUsername(username);
             usuario.setPassword(password);
-            UsuarioServices usuarioServices1 = new UsuarioServices();
+            UsuarioServices usuarioServices1 = UsuarioServices.getInstancia();
 
             Usuario usuario1 = usuarioServices1.getUsuario(username);
            if(usuario1.getNombre()!=null){
 
                  if(usuario1.getUsername().equals(username) && usuario1.getPassword().equals(password)) {
-
                      usuario.setId(usuarioServices1.getUsuario(username).getId());
                      usuario.setAutor(usuarioServices1.getUsuario(username).getAutor());
                      usuario.setAdministrador(usuarioServices1.getUsuario(username).getAdministrador());
@@ -305,7 +302,7 @@ public class Main {
             List<Comentario>comentarios=null;
 
             etiquetas= etiquetaServices.findAllByArticulo(articulo);
-            comentarios= comentarioServices.findAllById(articulo);
+            comentarios= comentarioServices.findAllByArticulo(articulo);
             articulo.setEtiquetas(etiquetas);
             articulo.setComentarios(comentarios);
 
@@ -361,7 +358,7 @@ public class Main {
             if(etiquetas.length!=0){
                 EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
 
-                List<Etiqueta>etiquetas1 = etiquetaServices.findAllByArticulo(id);
+                List<Etiqueta>etiquetas1 = etiquetaServices.findAllByArticulo(articulo);
                 int count =0;
                 for(String et: etiquetas){
                     if(!etiquetas1.get(0).getEtiqueta().equals(et))

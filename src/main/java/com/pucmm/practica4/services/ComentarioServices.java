@@ -28,12 +28,11 @@ public class ComentarioServices extends GestionDb<Comentario> {
         }
         return instancia;
     }
-    public List<Comentario> findAllById(Articulo articulo){
+    public List<Comentario> findAllByArticulo(Articulo articulo){
         EntityManager entityManager = getEntityManager();
         Query query= entityManager.createNamedQuery("Comentario.findAllByArticulo");
         query.setParameter("articulo", articulo+"%");
-        List<Comentario> comentarios = query.getResultList();
-        return comentarios;
+        return query.getResultList();
     }
 
 }

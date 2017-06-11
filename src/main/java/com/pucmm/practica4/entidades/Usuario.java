@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
  * Created by anyderre on 04/06/17.
  */
 @Entity
+@NamedQueries({@NamedQuery(name="Usuario.findByUsername", query = "select u from Usuario u where u.username like :username")})
 public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

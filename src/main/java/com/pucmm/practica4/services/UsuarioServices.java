@@ -1,9 +1,9 @@
 package com.pucmm.practica4.services;
 
-
-
 import com.pucmm.practica4.entidades.Usuario;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,5 +27,13 @@ public class UsuarioServices extends GestionDb<Usuario> {
             instancia = new UsuarioServices();
         }
         return instancia;
+    }
+
+    public Usuario getUsuario(String username){
+        EntityManager entityManager = getEntityManager();
+        Query query= entityManager.createNamedQuery("Usuario.findByUsername");
+        query.setParameter("username", username+"%");
+        return (Usuario)query.getSingleResult();
+
     }
 }
