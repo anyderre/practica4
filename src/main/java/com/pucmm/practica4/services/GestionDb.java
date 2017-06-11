@@ -26,7 +26,7 @@ public class GestionDb<T> {
         return entityManagerFactory.createEntityManager();
     }
 
-    private Object getFieldValue(T entidad){
+    public Object getFieldValue(T entidad){
         for(Field field: entidad.getClass().getDeclaredFields()){
             if(field.isAnnotationPresent(Id.class)){
                 try{
@@ -41,7 +41,7 @@ public class GestionDb<T> {
         return null;
     }
 
-    private void crear(T entidad){
+    public void crear(T entidad){
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         try {
@@ -55,7 +55,7 @@ public class GestionDb<T> {
         }
     }
 
-    private void editar(T entidad){
+    public void editar(T entidad){
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         try{
@@ -69,7 +69,7 @@ public class GestionDb<T> {
         }
     }
 
-    private void delete (Object entidadId){
+    public void delete (Object entidadId){
         EntityManager entityManager =getEntityManager();
         entityManager.getTransaction().begin();
         try{
@@ -84,7 +84,7 @@ public class GestionDb<T> {
         }
     }
 
-    private T find(Object id){
+    public T find(Object id){
         EntityManager entityManager = getEntityManager();
         try {
             return entityManager.find(this.entidad,id);
@@ -94,7 +94,7 @@ public class GestionDb<T> {
             entityManager.close();
         }
     }
-    private List<T>findAll(){
+    public List<T>findAll(){
         EntityManager entityManager = getEntityManager();
         try {
             CriteriaQuery<T> criteriaQuery = entityManager.getCriteriaBuilder().createQuery(this.entidad);

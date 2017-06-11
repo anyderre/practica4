@@ -18,8 +18,7 @@ public class Etiqueta implements Serializable {
     @ManyToOne()
     private Articulo articulo;
 
-    public Etiqueta(long id,  String etiqueta, Articulo articulo) {
-        this.id=id;
+    public Etiqueta(String etiqueta, Articulo articulo) {
         this.etiqueta = etiqueta;
         this.articulo = articulo;
     }

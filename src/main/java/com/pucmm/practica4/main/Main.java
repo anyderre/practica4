@@ -1,9 +1,14 @@
-package edu.pucmm;
+package com.pucmm.practica4.main;
 
-import com.modelo.*;
+
+import com.pucmm.practica4.entidades.Articulo;
+import com.pucmm.practica4.entidades.Comentario;
+import com.pucmm.practica4.entidades.Etiqueta;
+import com.pucmm.practica4.entidades.Usuario;
+import com.pucmm.practica4.services.*;
 import com.sun.org.apache.regexp.internal.RE;
 import freemarker.template.Configuration;
-import services.*;
+
 import spark.ModelAndView;
 import spark.Session;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -14,6 +19,7 @@ import java.util.Date;
 
 import static java.lang.Class.forName;
 import static spark.Spark.*;
+import static spark.debug.DebugScreen.enableDebugScreen;
 import static spark.route.HttpMethod.*;
 
 /**
@@ -25,16 +31,15 @@ public class Main {
 
         //Seteando el puerto en Heroku
         port(getHerokuAssignedPort());
-
+        enableDebugScreen();
 
         //indicando los recursos publicos.
         staticFiles.location("/publico");
 
         //Starting database
-        BootStrapServices.startDb();
+        BootStrapServices.getInstancia().init();
 
         //Testing Connection
-        DataBaseServices.getInstancia().testConexion();
 
         //Creating table if not exists
         BootStrapServices.crearTablas();
@@ -159,7 +164,7 @@ public class Main {
 
             if(request.queryParams("password").matches(request.queryParams("password-confirm"))){
                 Usuario usuario = request.session(true).attribute("usuario");
-                System.out.println(usuario.getAdministrador());
+
                 if(usuario.getAdministrador()){
                     Usuario newUsuario = new Usuario();
                     newUsuario.setNombre(request.queryParams("nombre"));
@@ -167,8 +172,8 @@ public class Main {
                     newUsuario.setAutor(true);
                     newUsuario.setPassword(request.queryParams("password"));
                     newUsuario.setUsername(request.queryParams("username"));
-                    UsuarioServices usuarioServices1 = new UsuarioServices();
-                    usuarioServices1.crearUsuario(newUsuario);
+                    UsuarioServices usuarioServices1 = UsuarioServices.getInstancia();
+                    usuarioServices1.crear(newUsuario);
                     response.redirect("/");
                 }else{
                     attributes.put("message", "Solo administrador puede crear usario");
@@ -190,8 +195,8 @@ public class Main {
           }catch (Exception ex){
               ex.printStackTrace();
           }
-          EtiquetaServices etiquetaServices = new EtiquetaServices();
-          etiquetaServices.borrarEtiqueta(id);
+          EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+          etiquetaServices.delete(id);
           response.redirect("/ver/articulo/"+articulo);
           return "";
     });
@@ -208,15 +213,15 @@ public class Main {
             Usuario usuario = session.attribute("usuario");
             System.out.println(usuario.getUsername());
 
-            ArticuloServices  articuloServices = new ArticuloServices();
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
             Comentario comentario1=new Comentario();
             comentario1.setAutor(usuario);
             comentario1.setComentario(request.queryParams("comentario"));
-            comentario1.setArticulo(articuloServices.getArticulo(articulo));
+            comentario1.setArticulo(articuloServices.find(articulo));
 
 
-            ComentarioServices comentarioServices = new ComentarioServices();
-            comentarioServices.crearComentario(comentario1);
+            ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+            comentarioServices.crear(comentario1);
 
             response.redirect("/ver/articulo/"+articulo);
 
@@ -251,7 +256,7 @@ public class Main {
         post("/agregar/articulo",(request, response)->{
             String []etiquetas=request.queryParams("etiquetas").split(",");
             //String autor = request.queryParams("username");
-            ArticuloServices articuloServices=new ArticuloServices();
+            ArticuloServices articuloServices=ArticuloServices.getInstancia();
             Session session = request.session(true);
 
             Usuario usuario = session.attribute("usuario");
@@ -265,18 +270,18 @@ public class Main {
             articulo.setAutor(usuario);
             articulo.setFecha(new Date());
 
-            articuloServices.crearArticulo(articulo);
+            articuloServices.crear(articulo);
 
             //getting the recent ID
-            ArticuloServices articuloServices1=new ArticuloServices();
-            List <Articulo>articulo1= articuloServices1.listarArticulos();
+            ArticuloServices articuloServices1=ArticuloServices.getInstancia();
+            List <Articulo>articulo1= articuloServices1.findAll();
             long id = articulo1.get(articulo1.size()-1).getId();
 
             if(etiquetas.length!=0){
-                EtiquetaServices etiquetaServices = new EtiquetaServices();
+                EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
                 articulo.setId(id);
                 for(String et: etiquetas){
-                    etiquetaServices.crearEtiqueta(new Etiqueta(et,articulo));
+                    etiquetaServices.crear(new Etiqueta(et,articulo));
                 }
             }else{
                 System.out.println("Error al entrar las etiquetas");
@@ -292,15 +297,15 @@ public class Main {
             Usuario usuario = request.session(true).attribute("usuario");
 
             long id= (long)Integer.parseInt(request.params("id"));
-            ArticuloServices articuloServices = new ArticuloServices();
-            Articulo articulo = articuloServices.getArticulo(id);
-            EtiquetaServices etiquetaServices = new EtiquetaServices();
-            ComentarioServices comentarioServices = new ComentarioServices();
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            Articulo articulo = articuloServices.find(id);
+            EtiquetaServices etiquetaServices =EtiquetaServices.getInstancia();
+            ComentarioServices comentarioServices =ComentarioServices.getInstancia();
             List<Etiqueta> etiquetas = null;
             List<Comentario>comentarios=null;
 
-            etiquetas= etiquetaServices.getAllEtiquetas(articulo.getId());
-            comentarios= comentarioServices.listarComentarios(articulo.getId());
+            etiquetas= etiquetaServices.findAllByArticulo(articulo);
+            comentarios= comentarioServices.findAllById(articulo);
             articulo.setEtiquetas(etiquetas);
             articulo.setComentarios(comentarios);
 
@@ -316,10 +321,11 @@ public class Main {
         get("/modificar/articulo/:id", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
             Usuario usuario = request.session(true).attribute("usuario");
-            ArticuloServices articuloServices = new ArticuloServices();
-            Articulo articulo = articuloServices.getArticulo(Long.parseLong(request.params("id")));
-            EtiquetaServices etiquetaServices = new EtiquetaServices();
-            List<Etiqueta> etiquetas =etiquetaServices.getAllEtiquetas(Long.parseLong(request.params("id")));
+            ArticuloServices articuloServices =ArticuloServices.getInstancia();
+            Articulo articulo = articuloServices.find(Long.parseLong(request.params("id")));
+            EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+
+            List<Etiqueta> etiquetas =etiquetaServices.findAllByArticulo(articulo);
 
             model.put("articulo",articulo);
             model.put("etiquetas",etiquetas);
@@ -339,7 +345,7 @@ public class Main {
             Long id = Long.parseLong(request.params("id"));
             String []etiquetas=request.queryParams("etiquetas").split(",");
             //String autor = request.queryParams("username");
-            ArticuloServices articuloServices=new ArticuloServices();
+            ArticuloServices articuloServices=ArticuloServices.getInstancia();
             Session session = request.session(true);
 
             Usuario usuario = session.attribute("usuario");
@@ -353,20 +359,20 @@ public class Main {
             articulo.setId(id);
             System.out.println();
             if(etiquetas.length!=0){
-                EtiquetaServices etiquetaServices = new EtiquetaServices();
+                EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
 
-                List<Etiqueta>etiquetas1 = etiquetaServices.getAllEtiquetas(id);
+                List<Etiqueta>etiquetas1 = etiquetaServices.findAllByArticulo(id);
                 int count =0;
                 for(String et: etiquetas){
                     if(!etiquetas1.get(0).getEtiqueta().equals(et))
-                        etiquetaServices.crearEtiqueta(new Etiqueta(et,articulo));
+                        etiquetaServices.crear(new Etiqueta(et,articulo));
                     count+=1;
                 }
             }else{
                 System.out.println("Error al entrar las etiquetas");
             }
             System.out.println("there");
-            articuloServices.actualizarArticulos(articulo);
+            articuloServices.editar(articulo);
 
             response.redirect("/ver/articulo/"+id);
             return "";
@@ -386,13 +392,13 @@ public class Main {
             }catch (Exception ex){
                 ex.printStackTrace();
             }
-            EtiquetaServices etiquetaServices = new EtiquetaServices();
-            ComentarioServices comentarioServices = new ComentarioServices();
-            ArticuloServices articuloServices = new ArticuloServices();
+            EtiquetaServices etiquetaServices =EtiquetaServices.getInstancia();
+            ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
 
-            etiquetaServices.borrarEtiqueta(articulo);
-            comentarioServices.borrarComentario(articulo);
-            articuloServices.borrarArticulo(articulo);
+            etiquetaServices.delete(articulo);
+            comentarioServices.delete(articulo);
+            articuloServices.delete(articulo);
             response.redirect("/");
             return "";
         });
