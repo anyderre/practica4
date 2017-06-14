@@ -11,14 +11,19 @@ public class Comentario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private int likes;
+    private int dislikes;
+    @Lob
     private String comentario;
     @OneToOne
     private Usuario autor;
     @ManyToOne()
     private Articulo articulo;
 
-    public Comentario( long id, String comentario, Usuario autor, Articulo articulo) {
-        this.id =id;
+
+    public Comentario(int likes, int dislikes, String comentario, Usuario autor, Articulo articulo) {
+        this.likes = likes;
+        this.dislikes = dislikes;
         this.comentario = comentario;
         this.autor = autor;
         this.articulo = articulo;
@@ -26,6 +31,23 @@ public class Comentario {
 
     public Comentario() {
     }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+
 
     public long getId() {
         return id;

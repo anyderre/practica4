@@ -35,4 +35,5 @@ public class ComentarioServices extends GestionDb<Comentario> {
         return query.getResultList();
     }
 
+
 }

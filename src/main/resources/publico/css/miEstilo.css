@@ -108,11 +108,10 @@ a:hover { text-decoration: none }
     display:none;
 }
 
-
 .article-container{
-    margin-left: 20%;
-    margin-right: 35%;
-    background-color: #dff0d8;
+    margin-left: 15%;
+    margin-right: 15%;
+    background-color: #d9edf7;
 }
 .links{
     font-weight: bold;
@@ -121,4 +120,47 @@ a:hover { text-decoration: none }
 }
 .links:hover{
     cursor: pointer;
+}
+body{
+    background: url("/publico/images/background.jpg");
+}
+#header{
+    text-align: center;
+}
+.glyphicon-tags{
+    padding-right: 8px;
+
+}
+#article-preview{
+    border:1px solid lightgrey;
+    padding: 15px;
+    padding-top: 25px;
+    padding-left: 30px;
+}
+#article-title{
+    text-align: center;
+}
+#by{
+    margin-left: 10px;
+}
+#date{
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+#comentario{
+    border:1px solid gray;
+    background-color: white;
+    border-radius: 3%;
+    padding: 2%;
+}
+/* botones dislike y like*/
+.icono{
+    padding:8px;
+    margin-right:4px;
+    background: white;
+
+}
+.icon-btn {
+    padding: 1px 8px 3px 2px;
+    border-radius:50px;
 }

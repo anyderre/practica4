@@ -39,22 +39,22 @@ public class Main {
         BootStrapServices.getInstancia().init();
 
 
-            //Adding admin user
-            UsuarioServices usuarioServices = UsuarioServices.getInstancia();
+        //Adding admin user
+        UsuarioServices usuarioServices = UsuarioServices.getInstancia();
 
-                Usuario insertar = new Usuario();
-                insertar.setAdministrador(true);
-                insertar.setId(1);
-                insertar.setAutor(true);
-                insertar.setNombre("Jhon Ridore");
-                insertar.setPassword("1234");
-                insertar.setUsername("anyderre");
+        Usuario insertar = new Usuario();
+        insertar.setAdministrador(true);
+        insertar.setId(1);
+        insertar.setAutor(true);
+        insertar.setNombre("Jhon Ridore");
+        insertar.setPassword("1234");
+        insertar.setUsername("anyderre");
         System.out.println("there");
-             if(usuarioServices.getUsuario("anyderre").isEmpty()){
-                 System.out.println("there");
-                usuarioServices.crear(insertar);
+        if(usuarioServices.getUsuario("anyderre").isEmpty()){
+            System.out.println("there");
+            usuarioServices.crear(insertar);
 
-            }
+        }
 
 
         //Indicando la carpeta por defecto que estaremos usando.
@@ -64,25 +64,25 @@ public class Main {
 
 
         get("/", (request, response) -> {
-                    Map<String, Object> attributes = new HashMap<>();
+            Map<String, Object> attributes = new HashMap<>();
 
-                    ArticuloServices articuloServices = ArticuloServices.getInstancia();
-                    ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAll();
-                    EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
-                    ComentarioServices comentarioServices = ComentarioServices.getInstancia();
-                    List<Etiqueta> etiquetas = null;
-                    List<Comentario>comentarios=null;
-                    List<Articulo> articulosTemp=new ArrayList<>();
-                    for(Articulo articulo: articulos){
-                        etiquetas= etiquetaServices.findAllByArticulo(articulo);
-                        comentarios= comentarioServices.findAllByArticulo(articulo);
-                        articulo.setEtiquetas(etiquetas);
-                        articulo.setComentarios(comentarios);
-                        articulosTemp.add(articulo);
-                    }
-                    //inversing ArrayList order
-                    Collections.reverse(articulosTemp);
-                    attributes.put("articulos", articulosTemp);
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAll();
+            EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+            ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+            List<Etiqueta> etiquetas = null;
+            List<Comentario>comentarios=null;
+            List<Articulo> articulosTemp=new ArrayList<>();
+            for(Articulo articulo: articulos){
+                etiquetas= etiquetaServices.findAllByArticulo(articulo);
+                comentarios= comentarioServices.findAllByArticulo(articulo);
+                articulo.setEtiquetas(etiquetas);
+                articulo.setComentarios(comentarios);
+                articulosTemp.add(articulo);
+            }
+            //inversing ArrayList order
+            Collections.reverse(articulosTemp);
+            attributes.put("articulos", articulosTemp);
 
             if (articulos.size()==0) {
                 attributes.put("noDatos", "Todavia no hay Articulos en la base de datos");
@@ -91,7 +91,7 @@ public class Main {
             System.out.println(articulos.size());
 
             attributes.put("titulo", "Welcome");
-           // attributes.put("articulos", articulos);
+            // attributes.put("articulos", articulos);
             return new ModelAndView(attributes, "index.ftl");
         }, freeMarkerEngine);
 
@@ -115,25 +115,25 @@ public class Main {
             UsuarioServices usuarioServices1 = UsuarioServices.getInstancia();
 
             List<Usuario> usuarios = usuarioServices1.getUsuario(username);
-           if(usuarios.get(0).getNombre()!=null){
+            if(usuarios.get(0).getNombre()!=null){
 
-                 if(usuarios.get(0).getUsername().equals(username) && usuarios.get(0).getPassword().equals(password)) {
-                     usuario.setId(usuarios.get(0).getId());
-                     usuario.setAutor(usuarios.get(0).getAutor());
-                     usuario.setAdministrador(usuarios.get(0).getAdministrador());
-                     usuario.setNombre(usuarios.get(0).getNombre());
-                     session.attribute("usuario", usuario);
-                     response.redirect("/");
-                 }
-           }
-           attributes.put("message", "Lo siento no tienes cuenta registrada solo un admin puede registrarte");
+                if(usuarios.get(0).getUsername().equals(username) && usuarios.get(0).getPassword().equals(password)) {
+                    usuario.setId(usuarios.get(0).getId());
+                    usuario.setAutor(usuarios.get(0).getAutor());
+                    usuario.setAdministrador(usuarios.get(0).getAdministrador());
+                    usuario.setNombre(usuarios.get(0).getNombre());
+                    session.attribute("usuario", usuario);
+                    response.redirect("/");
+                }
+            }
+            attributes.put("message", "Lo siento no tienes cuenta registrada solo un admin puede registrarte");
             attributes.put("titulo", "login");
 
             return new ModelAndView(attributes, "login.ftl");
         }, freeMarkerEngine);
 
 
- //------------------------------------------//Admin task------------------------------------------------------------
+        //------------------------------------------//Admin task------------------------------------------------------------
         before("/registrar", (request, response) -> {
             Usuario usuario = request.session(true).attribute("usuario");
 
@@ -178,25 +178,38 @@ public class Main {
 
 
 //<--------------------------------------------------Etiquetas crud------------------------------------------------------------------------------------------------------------------->
-      delete("/etiqueta/:articulo/borrar/:id",(request, response)->{
-          long id=0,articulo=0;
-          try{
-               id = Long.parseLong(request.params("id"));
-               articulo = Long.parseLong(request.params("articulo"));
-          }catch (Exception ex){
-              ex.printStackTrace();
-          }
-          EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
-          etiquetaServices.delete(id);
-          response.redirect("/ver/articulo/"+articulo);
-          return "";
-    });
+        delete("/etiqueta/:articulo/borrar/:id",(request, response)->{
+            long id=0,articulo=0;
+            try{
+                id = Long.parseLong(request.params("id"));
+                articulo = Long.parseLong(request.params("articulo"));
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+            etiquetaServices.delete(id);
+            response.redirect("/ver/articulo/"+articulo);
+            return "";
+        });
 
+        get("/etiqueta/:etiqueta/articulos",(request, response) -> {
+            Map<String, Object> model = new HashMap<>();
+            String etiqueta =request.params("etiqueta");
+            EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+            List<Etiqueta> etiquetas= etiquetaServices.findAllByEtiqueta(etiqueta);
+            List<Articulo> articulos = new ArrayList<>();
+            for(Etiqueta et : etiquetas){
+                articulos.add(et.getArticulo());
+            }
 
+            model.put("titulo", "Articulos con misma etiqueta");
+            model.put("articulos", articulos);
+            return new ModelAndView(model, "Articulos.ftl");
+        },freeMarkerEngine);
 //<--------------------------------------------------Comentario crud------------------------------------------------------------------------------------------------------------------->
 
         post("/agregar/comentario/:articulo", (request, response)->{
-           // long articulo=0;
+            // long articulo=0;
 
             long articulo= Long.parseLong((request.params("articulo")));
 
@@ -208,6 +221,8 @@ public class Main {
             Comentario comentario1=new Comentario();
             comentario1.setAutor(usuario);
             comentario1.setComentario(request.queryParams("comentario"));
+            comentario1.setDislikes(0);
+            comentario1.setLikes(0);
             comentario1.setArticulo(articuloServices.find(articulo));
 
 
@@ -216,7 +231,7 @@ public class Main {
 
             response.redirect("/ver/articulo/"+articulo);
 
-          return "";
+            return "";
         });
 
         before("/agregar/comentario/:articulo", (request, response) -> {
@@ -268,7 +283,7 @@ public class Main {
             //getting the recent ID
             ArticuloServices articuloServices1=ArticuloServices.getInstancia();
             List <Articulo>articulos= articuloServices1.findAll();
-           // System.out.println(articulos.get(0).getAutor()+"=======================================");
+            // System.out.println(articulos.get(0).getAutor()+"=======================================");
             long id = articulos.get(articulos.size()-1).getId();
 
             if(etiquetas.length!=0){
@@ -306,6 +321,8 @@ public class Main {
 
             model.put("titulo", "Welcome");
             model.put("articulo", articulo);
+            model.put("comment_likes", articulo.getLikes());
+            model.put("comment_dislikes", articulo.getDislikes());
 
             model.put("titulo", "Ver articulo");
             return new ModelAndView(model, "verArticulo.ftl");
@@ -396,6 +413,25 @@ public class Main {
             response.redirect("/");
             return "";
         });
+//-________________________________________________likes && dislikes______________________________________________
+    before("/likes/:id/:articulo", (request, response) -> {
+        Usuario usuario = request.session(true).attribute("usuario");
+        if (usuario == null) {
+            response.redirect("/login");
+        }
+    });
+
+    get("/likes/:id/:articulo",(request, response) -> {
+        Usuario usuario = request.session(true).attribute("usuario");
+       ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+       Comentario comentario= comentarioServices.find(Long.parseLong(request.params("id")));
+       comentario.setLikes(comentario.getLikes()+1);
+       comentarioServices.editar(comentario);
+       response.redirect("/ver/articulo/"+request.params("articulo"));
+       return "";
+    });
+
+
 
     }  /**
      * Metodo para setear el puerto en Heroku
@@ -409,4 +445,3 @@ public class Main {
         return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
 }
-

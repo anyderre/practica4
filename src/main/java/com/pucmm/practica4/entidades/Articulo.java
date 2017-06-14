@@ -18,17 +18,19 @@ public class Articulo implements Serializable {
     @Column(unique = true)
     private String titulo;
     @Column(unique = true)
+    @Lob
     private String cuerpo;
     @OneToOne()
     private Usuario autor;
     private Date fecha;
+    private int likes;
+    private int dislikes;
 
     @OneToMany(mappedBy = "articulo")
     private List<Comentario> comentarios;
     @OneToMany(mappedBy = "articulo")
     private List<Etiqueta> etiquetas;
-    private int likes;
-    private int dislikes;
+
 
     public Articulo(long id, String titulo, String cuerpo, Usuario autor, Date fecha, int likes,int dislikes) {
         this.id=id;
