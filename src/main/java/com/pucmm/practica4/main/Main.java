@@ -1,13 +1,11 @@
 package com.pucmm.practica4.main;
 
-import com.pucmm.practica4.entidades.Articulo;
-import com.pucmm.practica4.entidades.Comentario;
-import com.pucmm.practica4.entidades.Etiqueta;
-import com.pucmm.practica4.entidades.Usuario;
+import com.pucmm.practica4.entidades.*;
 import com.pucmm.practica4.services.*;
 import com.sun.org.apache.regexp.internal.RE;
 import freemarker.template.Configuration;
 
+import org.hibernate.criterion.LikeExpression;
 import spark.ModelAndView;
 import spark.Session;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -215,16 +213,13 @@ public class Main {
 
             Session session = request.session(true);
             Usuario usuario = session.attribute("usuario");
-            System.out.println(usuario.getUsername());
 
             ArticuloServices articuloServices = ArticuloServices.getInstancia();
             Comentario comentario1=new Comentario();
             comentario1.setAutor(usuario);
             comentario1.setComentario(request.queryParams("comentario"));
-            comentario1.setDislikes(0);
-            comentario1.setLikes(0);
-            comentario1.setArticulo(articuloServices.find(articulo));
 
+            comentario1.setArticulo(articuloServices.find(articulo));
 
             ComentarioServices comentarioServices = ComentarioServices.getInstancia();
             comentarioServices.crear(comentario1);
@@ -279,10 +274,9 @@ public class Main {
 
             articuloServices.crear(articulo);
 
-            //getting the recent ID
             ArticuloServices articuloServices1=ArticuloServices.getInstancia();
             List <Articulo>articulos= articuloServices1.findAll();
-            // System.out.println(articulos.get(0).getAutor()+"=======================================");
+
             long id = articulos.get(articulos.size()-1).getId();
 
             if(etiquetas.length!=0){
@@ -299,7 +293,13 @@ public class Main {
             return "";
         });
 
+        before("/ver/articulo/:id", (request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
 
+            if (usuario == null) {
+                response.redirect("/login");
+            }
+        });
         get("/ver/articulo/:id", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
             Usuario usuario = request.session(true).attribute("usuario");
@@ -309,6 +309,8 @@ public class Main {
             Articulo articulo = articuloServices.find(id);
             EtiquetaServices etiquetaServices =EtiquetaServices.getInstancia();
             ComentarioServices comentarioServices =ComentarioServices.getInstancia();
+            LikesServices likesServices =LikesServices.getInstancia();
+            DislikeServices dislikeServices = DislikeServices.getInstancia();
             List<Etiqueta> etiquetas = null;
             List<Comentario>comentarios=null;
 
@@ -317,17 +319,21 @@ public class Main {
             articulo.setEtiquetas(etiquetas);
             articulo.setComentarios(comentarios);
 
-
+            List<Comentario> comentarioList =new ArrayList<>();
+            for(Comentario comentario : comentarios){
+                comentario.setLikes(likesServices.findAllByComentario(comentario));
+                comentario.setDislikes(dislikeServices.findAllByComentario(comentario));
+                comentarioList.add(comentario);
+            }
             model.put("titulo", "Welcome");
             model.put("articulo", articulo);
-            model.put("comment_likes", articulo.getLikes());
-            model.put("comment_dislikes", articulo.getDislikes());
-
             model.put("titulo", "Ver articulo");
+            model.put("comments", comentarioList);
             return new ModelAndView(model, "verArticulo.ftl");
         },freeMarkerEngine);
 
-//------------------------modifying articulo---------------------------
+//______________________________________modifying articulo__________________________________________
+
         get("/modificar/articulo/:id", (request, response) -> {
             Map<String, Object> model = new HashMap<>();
             Usuario usuario = request.session(true).attribute("usuario");
@@ -354,7 +360,7 @@ public class Main {
         post("/modificar/:id/articulo",(request, response)->{
             Long id = Long.parseLong(request.params("id"));
             String []etiquetas=request.queryParams("etiquetas").split(",");
-            //String autor = request.queryParams("username");
+
             ArticuloServices articuloServices=ArticuloServices.getInstancia();
             Session session = request.session(true);
 
@@ -412,7 +418,7 @@ public class Main {
             response.redirect("/");
             return "";
         });
-//-________________________________________________likes && dislikes______________________________________________
+//-________________________________________________likes && dislikes for Comentario______________________________________________
     before("/likes/:id/:articulo", (request, response) -> {
         Usuario usuario = request.session(true).attribute("usuario");
         if (usuario == null) {
@@ -422,14 +428,75 @@ public class Main {
 
     get("/likes/:id/:articulo",(request, response) -> {
         Usuario usuario = request.session(true).attribute("usuario");
+
        ComentarioServices comentarioServices = ComentarioServices.getInstancia();
        Comentario comentario= comentarioServices.find(Long.parseLong(request.params("id")));
-       comentario.setLikes(comentario.getLikes()+1);
-       comentarioServices.editar(comentario);
+
+
+        LikesServices likesServices = LikesServices.getInstancia();
+        DislikeServices dislikeServices =DislikeServices.getInstancia();
+
+        Likes like = new Likes();
+        List<Likes> likes = likesServices.findAllByComentario(comentario);
+        List<Dislike> dislikes = dislikeServices.findAllByComentario(comentario);
+
+       for (Likes like1 : likes){
+           if (like1.getAutor().getUsername().equals(usuario.getUsername())){
+               response.redirect("/ver/articulo/"+request.params("articulo"));
+           }
+       }
+
+       for(Dislike dislike : dislikes){
+           if (dislike.getAutor().getUsername().equals(usuario.getUsername())){
+               dislikeServices.delete(dislike.getId());
+           }
+       }
+
+       like.setAutor(usuario);
+       like.setComentario(comentario);
+       likesServices.crear(like);
+
        response.redirect("/ver/articulo/"+request.params("articulo"));
        return "";
     });
 
+        before("/dislikes/:id/:articulo", (request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+            if (usuario == null) {
+                response.redirect("/login");
+            }
+        });
+
+        get("/dislikes/:id/:articulo",(request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+
+            ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+            Comentario comentario= comentarioServices.find(Long.parseLong(request.params("id")));
+
+            LikesServices likesServices = LikesServices.getInstancia();
+            DislikeServices dislikeServices =DislikeServices.getInstancia();
+
+            Dislike disLike = new Dislike();
+            List<Likes> likes = likesServices.findAllByComentario(comentario);
+            List<Dislike> dislikes = dislikeServices.findAllByComentario(comentario);
+
+            for (Dislike dislike1 : dislikes){
+                if (dislike1.getAutor().getUsername().equals(usuario.getUsername())){
+                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                }
+            }
+
+            for(Likes like : likes){
+                if (like.getAutor().getUsername().equals(usuario.getUsername())){
+                    likesServices.delete(like.getId());
+                }
+            }
+            disLike.setAutor(usuario);
+            disLike.setComentario(comentario);
+            dislikeServices.crear(disLike);
+            response.redirect("/ver/articulo/"+request.params("articulo"));
+            return "";
+        });
 
 
     }  /**

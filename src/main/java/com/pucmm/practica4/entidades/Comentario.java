@@ -1,6 +1,7 @@
 package com.pucmm.practica4.entidades;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by john on 04/06/17.
@@ -11,40 +12,41 @@ public class Comentario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private int likes;
-    private int dislikes;
     @Lob
     private String comentario;
     @OneToOne
     private Usuario autor;
     @ManyToOne()
     private Articulo articulo;
+    @OneToMany
+    private List<Likes>likes;
+    @OneToMany
+    private List<Dislike>dislikes;
 
-
-    public Comentario(int likes, int dislikes, String comentario, Usuario autor, Articulo articulo) {
-        this.likes = likes;
-        this.dislikes = dislikes;
+    public Comentario(String comentario, Usuario autor, Articulo articulo, List<Likes> likes, List<Dislike> dislikes) {
         this.comentario = comentario;
         this.autor = autor;
         this.articulo = articulo;
+        this.likes = likes;
+        this.dislikes = dislikes;
     }
 
     public Comentario() {
     }
 
-    public int getLikes() {
+    public List<Likes> getLikes() {
         return likes;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<Likes> likes) {
         this.likes = likes;
     }
 
-    public int getDislikes() {
+    public List<Dislike> getDislikes() {
         return dislikes;
     }
 
-    public void setDislikes(int dislikes) {
+    public void setDislikes(List<Dislike> dislikes) {
         this.dislikes = dislikes;
     }
 

@@ -19,38 +19,21 @@ public class Usuario implements Serializable {
     private String nombre;
     private Boolean administrador;
     private Boolean autor;
-    private Boolean gaveLike;
-    private Boolean gaveDislike;
 
-    public Usuario(String username, String password, String nombre, Boolean administrador, Boolean autor, Boolean gaveLike, Boolean gaveDislike) {
+
+    public Usuario(String username, String password, String nombre, Boolean administrador, Boolean autor) {
         this.username = username;
         this.password = password;
         this.nombre = nombre;
         this.administrador = administrador;
         this.autor = autor;
-        this.gaveLike = gaveLike;
-        this.gaveDislike = gaveDislike;
+
     }
 
     public Usuario(){
 
     }
 
-    public Boolean getGaveLike() {
-        return gaveLike;
-    }
-
-    public void setGaveLike(Boolean gaveLike) {
-        this.gaveLike = gaveLike;
-    }
-
-    public Boolean getGaveDislike() {
-        return gaveDislike;
-    }
-
-    public void setGaveDislike(Boolean gaveDislike) {
-        this.gaveDislike = gaveDislike;
-    }
 
     public long getId() {
         return id;

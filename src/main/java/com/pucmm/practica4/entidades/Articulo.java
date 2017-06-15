@@ -23,8 +23,6 @@ public class Articulo implements Serializable {
     @OneToOne()
     private Usuario autor;
     private Date fecha;
-    private int likes;
-    private int dislikes;
 
     @OneToMany(mappedBy = "articulo")
     private List<Comentario> comentarios;
@@ -32,14 +30,12 @@ public class Articulo implements Serializable {
     private List<Etiqueta> etiquetas;
 
 
-    public Articulo(long id, String titulo, String cuerpo, Usuario autor, Date fecha, int likes,int dislikes) {
+    public Articulo(long id, String titulo, String cuerpo, Usuario autor, Date fecha) {
         this.id=id;
         this.titulo = titulo;
         this.cuerpo = cuerpo;
         this.autor = autor;
         this.fecha = fecha;
-        this.likes =likes;
-        this.dislikes = dislikes;
     }
 
     public Articulo() {
@@ -102,19 +98,4 @@ public class Articulo implements Serializable {
         this.etiquetas = etiquetas;
     }
 
-    public int getLikes() {
-        return likes;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
-    public int getDislikes() {
-        return dislikes;
-    }
-
-    public void setDislikes(int dislikes) {
-        this.dislikes = dislikes;
-    }
 }
