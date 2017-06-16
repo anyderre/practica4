@@ -63,7 +63,6 @@
                 </div>
             </#if>
             </div>
-
         </div>
 
         <div class="row">
@@ -126,7 +125,6 @@
         }).mouseenter(function () {
             $(this).fadeTo('slow',1);
         });
-
 
         $('.likesandDislikes').fadeTo('fast',0);
         $(".article-container").mouseleave(function () {
