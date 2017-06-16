@@ -1,5 +1,6 @@
 package com.pucmm.practica4.services;
 
+import com.pucmm.practica4.entidades.Articulo;
 import com.pucmm.practica4.entidades.Comentario;
 import com.pucmm.practica4.entidades.Likes;
 
@@ -31,6 +32,12 @@ public class LikesServices extends GestionDb<Likes> {
             Query query= entityManager.createQuery("select l from Likes l where l.comentario like :comentario");
             query.setParameter("comentario", comentario);
             return query.getResultList();
+            }
+        public Boolean deleteAllByComentario(Comentario comentario){
+            EntityManager entityManager = getEntityManager();
+            Query query= entityManager.createQuery("delete from Likes a where a.comentario like :comentario");
+            query.setParameter("comentario", comentario);
+            return true;
         }
     }
 

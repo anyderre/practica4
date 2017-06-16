@@ -31,4 +31,10 @@ public class DislikeServices extends GestionDb<Dislike> {
         query.setParameter("comentario", comentario);
         return query.getResultList();
     }
+    public Boolean deleteAllByComentario(Comentario comentario){
+        EntityManager entityManager = getEntityManager();
+        Query query= entityManager.createQuery("delete from Dislike a where a.comentario like :comentario");
+        query.setParameter("comentario", comentario);
+        return true;
+    }
 }

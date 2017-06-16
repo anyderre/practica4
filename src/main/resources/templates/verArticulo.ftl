@@ -54,7 +54,7 @@
                     <div style="display: flex">
                       <b>Tags:</b>
                         <#list articuloEtiqueta as etiqueta>
-                                <a class="btn icon-btn btn-default" style="color: #ffffff;font-size:14px;margin:4px;background-color:#9d9d9d;"  href="/etiqueta/${etiqueta.getId()}/articulos">
+                                <a class="btn icon-btn btn-default" style="color: #ffffff;font-size:14px;margin:4px;background-color:#9d9d9d;"  href="/etiqueta/${etiqueta.getEtiqueta()}/articulos">
                                     <span class="glyphicon glyphicon-tags"></span>${etiqueta.getEtiqueta()}
                                 </a>
                         </#list>

@@ -31,4 +31,10 @@ public class ArticleLikeService extends GestionDb<ArticleLike> {
         query.setParameter("articulo", articulo);
         return query.getResultList();
     }
+    public Boolean deleteAllByArticulo(Articulo articulo){
+        EntityManager entityManager = getEntityManager();
+        Query query= entityManager.createQuery("delete from ArticleLike a where a.articulo like :articulo");
+        query.setParameter("articulo", articulo);
+        return true;
+    }
 }

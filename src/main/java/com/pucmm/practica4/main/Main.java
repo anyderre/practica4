@@ -47,9 +47,8 @@ public class Main {
         insertar.setNombre("Jhon Ridore");
         insertar.setPassword("1234");
         insertar.setUsername("anyderre");
-        System.out.println("there");
+
         if(usuarioServices.getUsuario("anyderre").isEmpty()){
-            System.out.println("there");
             usuarioServices.crear(insertar);
 
         }
@@ -86,7 +85,7 @@ public class Main {
                 attributes.put("noDatos", "Todavia no hay Articulos en la base de datos");
 
             };
-            System.out.println(articulos.size());
+
 
             attributes.put("titulo", "Welcome");
             // attributes.put("articulos", articulos);
@@ -263,7 +262,7 @@ public class Main {
             Usuario usuario = session.attribute("usuario");
 
 
-            //System.out.println(usuario);
+
             Articulo articulo = new Articulo();
             articulo.setTitulo( request.queryParams("titulo"));
             articulo.setCuerpo(request.queryParams("cuerpo"));
@@ -372,7 +371,7 @@ public class Main {
             Session session = request.session(true);
 
             Usuario usuario = session.attribute("usuario");
-            //System.out.println(usuario);
+
             Articulo articulo = new Articulo();
             articulo.setTitulo( request.queryParams("titulo"));
             articulo.setCuerpo(request.queryParams("cuerpo"));
@@ -380,7 +379,7 @@ public class Main {
             articulo.setAutor(usuario);
             articulo.setFecha(new Date());
             articulo.setId(id);
-            System.out.println();
+
             if(etiquetas.length!=0){
                 EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
 
@@ -394,7 +393,7 @@ public class Main {
             }else{
                 System.out.println("Error al entrar las etiquetas");
             }
-            System.out.println("there");
+
             articuloServices.editar(articulo);
 
             response.redirect("/ver/articulo/"+id);
@@ -408,6 +407,8 @@ public class Main {
             }
         });
 
+
+
         get("/borrar/articulo/:articulo",(request, response)->{
             long articulo=0;
             try{
@@ -415,13 +416,56 @@ public class Main {
             }catch (Exception ex){
                 ex.printStackTrace();
             }
+
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            Articulo articulo1 = articuloServices.find(articulo);
+
+
             EtiquetaServices etiquetaServices =EtiquetaServices.getInstancia();
             ComentarioServices comentarioServices = ComentarioServices.getInstancia();
-            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            ArticleLikeService articleLikeService=ArticleLikeService.getInstancia();
+            LikesServices likesServices=LikesServices.getInstancia();
+            AriticleDislikeService ariticleDislikeService=AriticleDislikeService.getInstancia();
+            DislikeServices dislikeServices=DislikeServices.getInstancia();
 
-            etiquetaServices.delete(articulo);
-            comentarioServices.delete(articulo);
-            articuloServices.delete(articulo);
+            List<Etiqueta> etiquetas = null;
+            List<Comentario>comentarios=null;
+            List<Likes> likes=null;
+            List<ArticleLike> articleLikes=null;
+            List<ArticleDislike> articleDislikes=null;
+            List<Dislike> dislikes=null;
+
+
+            etiquetas= etiquetaServices.findAllByArticulo(articulo1);
+            articleLikes=articleLikeService.findAllByArticulo(articulo1);
+            articleDislikes=ariticleDislikeService.findAllByArticulo(articulo1);
+
+            for(ArticleDislike articleDislike:articleDislikes){
+                ariticleDislikeService.delete(articleDislike.getId());
+            }
+
+            for(ArticleLike articleLike:articleLikes){
+                articleLikeService.delete(articleLike.getId());
+            }
+
+            comentarios= comentarioServices.findAllByArticulo(articulo1);
+            for(Etiqueta etiqueta:etiquetas){
+                etiquetaServices.delete(etiqueta.getId());
+            }
+
+            for(Comentario comentario:comentarios){
+                likes=likesServices.findAllByComentario(comentario);
+                dislikes=dislikeServices.findAllByComentario(comentario);
+                for(Likes likes1:likes){
+                    likesServices.delete(likes1.getId());
+                }
+                for (Dislike dislike: dislikes){
+                    dislikeServices.delete(dislike.getId());
+                }
+                comentarioServices.delete(comentario.getId());
+            }
+
+            articuloServices.delete(articulo1.getId());
             response.redirect("/");
             return "";
         });
@@ -483,6 +527,8 @@ public class Main {
             LikesServices likesServices = LikesServices.getInstancia();
             DislikeServices dislikeServices =DislikeServices.getInstancia();
 
+
+
             Dislike disLike = new Dislike();
             List<Likes> likes = likesServices.findAllByComentario(comentario);
             List<Dislike> dislikes = dislikeServices.findAllByComentario(comentario);
@@ -532,7 +578,6 @@ public class Main {
                     response.redirect("/ver/articulo/"+request.params("articulo"));
                 }
             }
-
             for(ArticleDislike dislike : dislikes){
                 if (dislike.getAutor().getUsername().equals(usuario.getUsername())){
                     ariticleDislikeService.delete(dislike.getId());

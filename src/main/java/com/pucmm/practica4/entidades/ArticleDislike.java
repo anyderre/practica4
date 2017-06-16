@@ -7,6 +7,7 @@ import java.io.Serializable;
  * Created by anyderre on 15/06/17.
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "ArticleDislike.findAllByArticulo", query = "select l from ArticleDislike l where l.articulo like :articulo")})
 public class ArticleDislike implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

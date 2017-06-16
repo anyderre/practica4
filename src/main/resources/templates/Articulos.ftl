@@ -1,12 +1,10 @@
 <#include "header.ftl">
 <#include "nav.ftl">
 
-<!-- Used to list article sin index site -->
-
 <#if articulos??>
     <#if articulos?size!=0>
         <#list articulos as articulo>
-        <div class="article-container">
+        <div class="article-container line-content">
             <div class="row">
                 <div class="col-md-offset- 2 col-md-9" id="header">
                     <a id="" href="/ver/articulo/${articulo.getId()}">
@@ -45,14 +43,13 @@
                             Etiqueta(s) <i class="fa fa-tags"></i>:
 
                             <#list articuloEtiqueta as etiqueta>
-                                <div class="tags">
-                                    <a style="color: #ffffff;font-size:14px;margin:4px;padding:5px 5px 5px 5px;background-color:#9d9d9d;" class="glyphicon glyphicon-tags" href="/etiqueta/${etiqueta.getId()}/articulos">${etiqueta.getEtiqueta()}</a>
-                                </div>
-
+                                    <a class="btn icon-btn btn-default" style="color: #ffffff;font-size:14px;margin:4px;background-color:#9d9d9d;"  href="/etiqueta/${etiqueta.getEtiqueta()}/articulos">
+                                        <span class="glyphicon glyphicon-tags"></span>${etiqueta.getEtiqueta()}
+                                    </a>
                             </#list>
                         </div>
 
-                        </p>
+
                     </div>
                 </#if>
 
@@ -60,8 +57,8 @@
 
         </div>
 
-        </div>
-        <hr>
+        <br>
+
         </#list>
     <#else>
         <#if noDatos??>
@@ -76,46 +73,37 @@
         </#if>
     </#if>
 </#if>
-<div class="row">
-    <div class="col-md-offset-5">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<div class="row" id="pagina">
+    <div class="col-md-offset-5 col-md-7">
+        <ul id="pagin">
+        </ul>
     </div>
-</div>
-<div class="demo2">Just for test</div>
-<div class="content2">page here</div>
-<script type="text/javascript">
-    var cant = parseInt($('#cant').text());
-    alert(cant);
-    $('.demo2').bootpag({
-        total: cant,
-        page: 1,
-        maxVisible: 5,
-        leaps:true
-    }).on('page', function(event, num){
-        loadPage(num)
-    });
-    function loadPage(num) {
-        $.get("/");
-    }
-</script>
+
+    <script type="text/javascript">
+
+        var cant = parseInt($('#cant').text());
+        pageSize = 5;
+
+        for(var i = 0 ; i<cant;i++){
+            $("#pagin").append('<li><a href="#">'+(i+1)+'</a></li> ');
+        }
+
+        $("#pagin li").first().find("a").addClass("current")
+        showPage = function(page) {
+            $(".line-content").hide();
+            $(".line-content").each(function(n) {
+                if (n >= pageSize * (page - 1) && n < pageSize * page)
+                    $(this).show();
+            });
+        }
+
+        showPage(1);
+
+        $("#pagin li a").click(function() {
+            $("#pagin li a").removeClass("current");
+            $(this).addClass("current");
+            showPage(parseInt($(this).text()))
+        });
+
+    </script>
 <#include "footer.ftl">
-
-
