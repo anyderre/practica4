@@ -384,11 +384,12 @@ public class Main {
                 EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
 
                 List<Etiqueta>etiquetas1 = etiquetaServices.findAllByArticulo(articulo);
-                int count =0;
+                for(Etiqueta etiqueta:etiquetas1){
+                    etiquetaServices.delete(etiqueta.getId());
+                }
+
                 for(String et: etiquetas){
-                    if(!etiquetas1.get(0).getEtiqueta().equals(et))
-                        etiquetaServices.crear(new Etiqueta(et,articulo));
-                    count+=1;
+                    etiquetaServices.crear(new Etiqueta(et,articulo));
                 }
             }else{
                 System.out.println("Error al entrar las etiquetas");
@@ -479,7 +480,7 @@ public class Main {
 
     get("/likes/:id/:articulo",(request, response) -> {
         Usuario usuario = request.session(true).attribute("usuario");
-
+        Boolean esta=false;
        ComentarioServices comentarioServices = ComentarioServices.getInstancia();
        Comentario comentario= comentarioServices.find(Long.parseLong(request.params("id")));
 
@@ -493,7 +494,7 @@ public class Main {
 
        for (Likes like1 : likes){
            if (like1.getAutor().getUsername().equals(usuario.getUsername())){
-               response.redirect("/ver/articulo/"+request.params("articulo"));
+               esta=true;
            }
        }
 
@@ -502,10 +503,11 @@ public class Main {
                dislikeServices.delete(dislike.getId());
            }
        }
-
-       like.setAutor(usuario);
-       like.setComentario(comentario);
-       likesServices.crear(like);
+       if(!esta){
+           like.setAutor(usuario);
+           like.setComentario(comentario);
+           likesServices.crear(like);
+       }
 
        response.redirect("/ver/articulo/"+request.params("articulo"));
        return "";
@@ -520,14 +522,12 @@ public class Main {
 
         get("/dislikes/:id/:articulo",(request, response) -> {
             Usuario usuario = request.session(true).attribute("usuario");
-
+            Boolean esta=false;
             ComentarioServices comentarioServices = ComentarioServices.getInstancia();
             Comentario comentario= comentarioServices.find(Long.parseLong(request.params("id")));
 
             LikesServices likesServices = LikesServices.getInstancia();
             DislikeServices dislikeServices =DislikeServices.getInstancia();
-
-
 
             Dislike disLike = new Dislike();
             List<Likes> likes = likesServices.findAllByComentario(comentario);
@@ -535,7 +535,7 @@ public class Main {
 
             for (Dislike dislike1 : dislikes){
                 if (dislike1.getAutor().getUsername().equals(usuario.getUsername())){
-                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                    esta = true;
                 }
             }
 
@@ -544,9 +544,12 @@ public class Main {
                     likesServices.delete(like.getId());
                 }
             }
-            disLike.setAutor(usuario);
-            disLike.setComentario(comentario);
-            dislikeServices.crear(disLike);
+            if(!esta){
+                disLike.setAutor(usuario);
+                disLike.setComentario(comentario);
+                dislikeServices.crear(disLike);
+            }
+
             response.redirect("/ver/articulo/"+request.params("articulo"));
             return "";
         });
@@ -561,7 +564,7 @@ public class Main {
 
         get("/articulo/likes/:articulo",(request, response) -> {
             Usuario usuario = request.session(true).attribute("usuario");
-
+            Boolean esta=false;
             ArticuloServices articuloServices = ArticuloServices.getInstancia();
             Articulo articulo= articuloServices.find(Long.parseLong(request.params("articulo")));
 
@@ -575,7 +578,7 @@ public class Main {
 
             for (ArticleLike like1 : likes){
                 if (like1.getAutor().getUsername().equals(usuario.getUsername())){
-                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                    esta = true;
                 }
             }
             for(ArticleDislike dislike : dislikes){
@@ -583,10 +586,12 @@ public class Main {
                     ariticleDislikeService.delete(dislike.getId());
                 }
             }
+            if(!esta){
+                like.setAutor(usuario);
+                like.setArticulo(articulo);
+                articleLikeService.crear(like);
+            }
 
-            like.setAutor(usuario);
-            like.setArticulo(articulo);
-            articleLikeService.crear(like);
 
             response.redirect("/ver/articulo/"+request.params("articulo"));
             return "";
@@ -601,7 +606,7 @@ public class Main {
 
         get("/articulo/dislikes/:articulo",(request, response) -> {
             Usuario usuario = request.session(true).attribute("usuario");
-
+            Boolean esta= false;
             ArticuloServices articuloServices = ArticuloServices.getInstancia();
             Articulo articulo= articuloServices.find(Long.parseLong(request.params("articulo")));
 
@@ -614,7 +619,7 @@ public class Main {
 
             for (ArticleDislike dislike1 : dislikes){
                 if (dislike1.getAutor().getUsername().equals(usuario.getUsername())){
-                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                    esta= true;
                 }
             }
 
@@ -623,9 +628,11 @@ public class Main {
                     articleLikeService.delete(like.getId());
                 }
             }
-            articleDislike.setAutor(usuario);
-            articleDislike.setArticulo(articulo);
-            ariticleDislikeService.crear(articleDislike);
+            if(!esta){
+                articleDislike.setAutor(usuario);
+                articleDislike.setArticulo(articulo);
+                ariticleDislikeService.crear(articleDislike);
+            }
 
             response.redirect("/ver/articulo/"+request.params("articulo"));
             return "";
