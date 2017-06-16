@@ -1,6 +1,7 @@
 <#include "header.ftl">
 <#include "nav.ftl">
 <div class="container">
+
     <div class="article-container">
         <div class="row">
             <div class="col-md-12">
@@ -19,15 +20,27 @@
         </div>
         <div class="row">
             <div class="col-md-12">
+
                 <div class="col-md-12" style="background-color: burlywood">
                     <h3 class="article-title" id="article-title">
                     ${articulo.getTitulo()}
                     </h3>
                 </div>
+                <div class="likesandDislikes">
+
+                    <a style="padding-bottom: 8px" class="icono-boton" href="/articulo/likes/${articulo.getId()}">
+                        <span class="glyphicon btn-glyphicon glyphicon-thumbs-up img-circle text-primary icono"></span><p>${articulo.getArticleLikes()?size}</p>
+                    </a>
+
+                    <a class="icono-boton" href="/articulo/dislikes/${articulo.getId()}">
+                        <span class="glyphicon btn-glyphicon glyphicon-thumbs-down img-circle text-primary icono"></span><p>${articulo.getArticleDislikes()?size}</p>
+                    </a>
+                </div>
 
                 <p class="article-preview" id ="article-preview">
                 ${articulo.getCuerpo()}
                 </p>
+
             </div>
         </div>
         <div class="row">
@@ -114,6 +127,14 @@
             $(this).fadeTo('slow',1);
         });
 
+
+        $('.likesandDislikes').fadeTo('fast',0);
+        $(".article-container").mouseleave(function () {
+            $('.likesandDislikes').fadeTo('slow',0).css("display","flex");
+
+        }).mouseenter(function () {
+            $('.likesandDislikes').fadeTo('slow',1).css("display","flex");
+        });
     });
 
 

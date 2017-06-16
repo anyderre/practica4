@@ -29,16 +29,39 @@ public class Articulo implements Serializable {
     @OneToMany(mappedBy = "articulo")
     private List<Etiqueta> etiquetas;
 
+    @OneToMany
+    private List<ArticleLike>articleLikes;
+    @OneToMany
+    private List<ArticleDislike>articleDislikes;
 
-    public Articulo(long id, String titulo, String cuerpo, Usuario autor, Date fecha) {
-        this.id=id;
+    public Articulo(String titulo, String cuerpo, Usuario autor, Date fecha, List<Comentario> comentarios, List<Etiqueta> etiquetas, List<ArticleLike> articleLikes, List<ArticleDislike> articleDislikes) {
         this.titulo = titulo;
         this.cuerpo = cuerpo;
         this.autor = autor;
         this.fecha = fecha;
+        this.comentarios = comentarios;
+        this.etiquetas = etiquetas;
+        this.articleLikes = articleLikes;
+        this.articleDislikes = articleDislikes;
     }
 
     public Articulo() {
+    }
+
+    public List<ArticleLike> getArticleLikes() {
+        return articleLikes;
+    }
+
+    public void setArticleLikes(List<ArticleLike> articleLikes) {
+        this.articleLikes = articleLikes;
+    }
+
+    public List<ArticleDislike> getArticleDislikes() {
+        return articleDislikes;
+    }
+
+    public void setArticleDislikes(List<ArticleDislike> articleDislikes) {
+        this.articleDislikes = articleDislikes;
     }
 
     public long getId() {

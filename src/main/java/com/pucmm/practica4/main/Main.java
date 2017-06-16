@@ -311,11 +311,16 @@ public class Main {
             ComentarioServices comentarioServices =ComentarioServices.getInstancia();
             LikesServices likesServices =LikesServices.getInstancia();
             DislikeServices dislikeServices = DislikeServices.getInstancia();
+            ArticleLikeService articleLikeService = ArticleLikeService.getInstancia();
+            AriticleDislikeService ariticleDislikeService = AriticleDislikeService.getInstancia();
+
+
             List<Etiqueta> etiquetas = null;
             List<Comentario>comentarios=null;
 
             etiquetas= etiquetaServices.findAllByArticulo(articulo);
             comentarios= comentarioServices.findAllByArticulo(articulo);
+
             articulo.setEtiquetas(etiquetas);
             articulo.setComentarios(comentarios);
 
@@ -325,6 +330,8 @@ public class Main {
                 comentario.setDislikes(dislikeServices.findAllByComentario(comentario));
                 comentarioList.add(comentario);
             }
+            articulo.setArticleDislikes(ariticleDislikeService.findAllByArticulo(articulo));
+            articulo.setArticleLikes(articleLikeService.findAllByArticulo(articulo));
             model.put("titulo", "Welcome");
             model.put("articulo", articulo);
             model.put("titulo", "Ver articulo");
@@ -494,6 +501,87 @@ public class Main {
             disLike.setAutor(usuario);
             disLike.setComentario(comentario);
             dislikeServices.crear(disLike);
+            response.redirect("/ver/articulo/"+request.params("articulo"));
+            return "";
+        });
+//-________________________________________________likes && dislikes for Articulo______________________________________________
+
+        before("/articulo/likes/:articulo", (request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+            if (usuario == null) {
+                response.redirect("/login");
+            }
+        });
+
+        get("/articulo/likes/:articulo",(request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            Articulo articulo= articuloServices.find(Long.parseLong(request.params("articulo")));
+
+
+            ArticleLikeService articleLikeService = ArticleLikeService.getInstancia();
+            AriticleDislikeService ariticleDislikeService = AriticleDislikeService.getInstancia();
+
+            ArticleLike like = new ArticleLike();
+            List<ArticleLike> likes = articleLikeService.findAllByArticulo(articulo);
+            List<ArticleDislike> dislikes = ariticleDislikeService.findAllByArticulo(articulo);
+
+            for (ArticleLike like1 : likes){
+                if (like1.getAutor().getUsername().equals(usuario.getUsername())){
+                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                }
+            }
+
+            for(ArticleDislike dislike : dislikes){
+                if (dislike.getAutor().getUsername().equals(usuario.getUsername())){
+                    ariticleDislikeService.delete(dislike.getId());
+                }
+            }
+
+            like.setAutor(usuario);
+            like.setArticulo(articulo);
+            articleLikeService.crear(like);
+
+            response.redirect("/ver/articulo/"+request.params("articulo"));
+            return "";
+        });
+
+        before("/articulo/dislikes/:articulo", (request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+            if (usuario == null) {
+                response.redirect("/login");
+            }
+        });
+
+        get("/articulo/dislikes/:articulo",(request, response) -> {
+            Usuario usuario = request.session(true).attribute("usuario");
+
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            Articulo articulo= articuloServices.find(Long.parseLong(request.params("articulo")));
+
+            ArticleLikeService articleLikeService = ArticleLikeService.getInstancia();
+            AriticleDislikeService ariticleDislikeService = AriticleDislikeService.getInstancia();
+
+            ArticleDislike articleDislike = new ArticleDislike();
+            List<ArticleLike> likes = articleLikeService.findAllByArticulo(articulo);
+            List<ArticleDislike> dislikes = ariticleDislikeService.findAllByArticulo(articulo);
+
+            for (ArticleDislike dislike1 : dislikes){
+                if (dislike1.getAutor().getUsername().equals(usuario.getUsername())){
+                    response.redirect("/ver/articulo/"+request.params("articulo"));
+                }
+            }
+
+            for(ArticleLike like : likes){
+                if (like.getAutor().getUsername().equals(usuario.getUsername())){
+                    articleLikeService.delete(like.getId());
+                }
+            }
+            articleDislike.setAutor(usuario);
+            articleDislike.setArticulo(articulo);
+            ariticleDislikeService.crear(articleDislike);
+
             response.redirect("/ver/articulo/"+request.params("articulo"));
             return "";
         });

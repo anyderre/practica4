@@ -150,7 +150,7 @@ body{
 #comentario{
     border:1px solid gray;
     background-color: white;
-    border-radius: 3%;
+    border-radius: 4%;
     padding: 2%;
 }
 /* botones dislike y like*/
@@ -160,7 +160,7 @@ body{
     background: white;
 
 }
-.icon-btn {
-    padding: 1px 8px 3px 2px;
-    border-radius:50px;
+.likesandDislikes{
+    position:absolute;
+    z-index: 1;
 }
