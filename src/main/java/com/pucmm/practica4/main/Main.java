@@ -64,17 +64,17 @@ public class Main {
             Map<String, Object> attributes = new HashMap<>();
 
             ArticuloServices articuloServices = ArticuloServices.getInstancia();
-            ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAll();
+            int size =articuloServices.findAll().size();
+            ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAllArticuloBetweenTwoIds(size-5);
             EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
             ComentarioServices comentarioServices = ComentarioServices.getInstancia();
             List<Etiqueta> etiquetas = null;
-            List<Comentario>comentarios=null;
             List<Articulo> articulosTemp=new ArrayList<>();
             for(Articulo articulo: articulos){
                 etiquetas= etiquetaServices.findAllByArticulo(articulo);
-                comentarios= comentarioServices.findAllByArticulo(articulo);
+
                 articulo.setEtiquetas(etiquetas);
-                articulo.setComentarios(comentarios);
+
                 articulosTemp.add(articulo);
             }
             //inversing ArrayList order
@@ -86,7 +86,39 @@ public class Main {
 
             };
 
+            attributes.put("size",size);
+            attributes.put("titulo", "Welcome");
+            // attributes.put("articulos", articulos);
+            return new ModelAndView(attributes, "index.ftl");
+        }, freeMarkerEngine);
 
+        get("/page/galery/:size/:number", (request, response) -> {
+            Map<String, Object> attributes = new HashMap<>();
+            ArticuloServices articuloServices = ArticuloServices.getInstancia();
+            int number = Integer.parseInt(request.params("number"));
+            int size = Integer.parseInt(request.params("size"));
+            ArrayList<Articulo> articulos = (ArrayList<Articulo>) articuloServices.findAllArticuloBetweenTwoIds(size-(number*5));
+            EtiquetaServices etiquetaServices = EtiquetaServices.getInstancia();
+            ComentarioServices comentarioServices = ComentarioServices.getInstancia();
+            List<Etiqueta> etiquetas = null;
+            List<Comentario>comentarios=null;
+            List<Articulo> articulosTemp=new ArrayList<>();
+            for(Articulo articulo: articulos){
+                etiquetas= etiquetaServices.findAllByArticulo(articulo);
+                articulo.setEtiquetas(etiquetas);
+
+                articulosTemp.add(articulo);
+            }
+            //inversing ArrayList order
+            Collections.reverse(articulosTemp);
+            attributes.put("articulos", articulosTemp);
+
+            if (articulos.size()==0) {
+                attributes.put("noDatos", "Todavia no hay Articulos en la base de datos");
+
+            };
+
+            attributes.put("size", size);
             attributes.put("titulo", "Welcome");
             // attributes.put("articulos", articulos);
             return new ModelAndView(attributes, "index.ftl");

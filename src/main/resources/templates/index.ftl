@@ -23,9 +23,10 @@
                     </#if>
                     <p class="article-preview">${cuerpoArticulo?substring(0, maxLength)} ...<a href="/ver/articulo/${articulo.getId()}" >Leer mas</a></p>
 
-                    <#assign result = articulos?size/5>
+                    <#assign result =size/5>
 
                     <p id="cant" style="display: none">${result?ceiling}</p>
+                    <p id="size" style="display: none">${size}</p>
                 </div>
 
             </div>
@@ -83,28 +84,19 @@
     <script type="text/javascript">
 
         var cant = parseInt($('#cant').text());
-        pageSize = 5;
 
         for(var i = 0 ; i<cant;i++){
-            $("#pagin").append('<li><a href="#">'+(i+1)+'</a></li> ');
+            if(i===0){
+                $("#pagin").append('<li><a href="/">'+(i+1)+'</a></li> ');
+            }else{
+                var c= i+1;
+                var sizeTotal=parseInt($('#size').text());
+                $("#pagin").append(
+                    $('<li>').append(
+                        $('<a>').attr('href', '/page/galery/'+sizeTotal+"/"+c).append(c)));
+            }
+
         }
-
-        $("#pagin li").first().find("a").addClass("current")
-        showPage = function(page) {
-            $(".line-content").hide();
-            $(".line-content").each(function(n) {
-                if (n >= pageSize * (page - 1) && n < pageSize * page)
-                    $(this).show();
-            });
-        }
-
-        showPage(1);
-
-        $("#pagin li a").click(function() {
-            $("#pagin li a").removeClass("current");
-            $(this).addClass("current");
-            showPage(parseInt($(this).text()))
-        });
 
     </script>
 <#include "footer.ftl">
